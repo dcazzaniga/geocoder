@@ -7,8 +7,51 @@ var log = require('./log');
 var fs = require('fs')
 
 console.log("Hello World")
+var params = process.argv.slice(2)
 
 var API_KEY = 'AIzaSyDD-u_oJWc47uV-lfJKlo2oOK2VSFRBAUM';
+
+if( params.length == 1){
+    readLines(params[0], function(msg){
+        console.log('FINITO')
+    } )
+}else if(params.length == 3) {
+    nearby(params[0],params[1],params[2]);
+}else{
+    console.log("MISSING PARAMETERS")
+    console.log("example: ./geocoder.js + latlong.csv | lat lng")
+}
+
+function nearby(lat, lng, meters){
+    var options = {
+        url: 'https://maps.googleapis.com/maps/api/place/nearbysearch/json',
+        method :'GET',
+        qs : {location : lat +","+lng , radius : meters, key:API_KEY }
+    }
+    request.get('https://maps.googleapis.com/maps/api/place/nearbysearch/json',
+        options,
+        function(error, response, body) {
+            if(error){
+                console.log(error);
+            }
+            var res = JSON.parse(body);
+            console.log(options)
+            if(res.status == 'OK'){
+                console.log('results:',res.results.length)
+                res.results.forEach(function(place){
+                    console.log(place.name, place.types)
+                })
+            }else{
+                console.log(res)
+            }
+
+            //if(result.re)
+            /*if(result.results[0]){
+                log.info(result.status, result.results[0] );
+            }*/
+        }
+    )
+}
 
 function logLL(address){
     var options = {
@@ -35,11 +78,6 @@ function logLL(address){
         }
     )
 }
-
-readLines('postpay.csv', function(msg){
-    console.log('FINITO')
-} )
-
 
 function readLines( dirPath, callback){
     // FILEs NAME
